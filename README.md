@@ -7,7 +7,7 @@ Sistema backend desenvolvido em Python com Flask para gerenciamento de avaliaç�
 ## Dupla
 
 - Nome: GUSTAVO BARBOSA — RA: 22506610
-- Nome: FRED GABRIEL — RA: **RA DO PARCEIRO AQUI**
+- Nome: FRED GABRIEL — RA: 22511576
 
 ---
 
