@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Sistema backend desenvolvido em Python com Flask para gerenciamento de avaliações de itens como filmes, produtos ou locais. Usuários podem se cadastrar, cadastrar itens categorizados e registrar avaliações com nota de 1 a 5 e comentário opcional. O sistema garante que um mesmo usuário não possa avaliar o mesmo item mais de uma vez, assegurando a integridade dos dados.
+Sistema web completo (full stack) desenvolvido em Python com Flask, com interface frontend para interação do usuário. O sistema serve para gerenciamento de avaliações de itens como filmes, produtos ou locais. Usuários podem se cadastrar, cadastrar itens categorizados e registrar avaliações com nota de 1 a 5 e comentário opcional. O sistema garante que um mesmo usuário não possa avaliar o mesmo item mais de uma vez, assegurando a integridade dos dados.
 
 ## Dupla
 
@@ -19,6 +19,9 @@ Sistema backend desenvolvido em Python com Flask para gerenciamento de avaliaç�
 - Flask-Migrate
 - SQLite
 - python-dotenv
+- HTML5
+- CSS3
+- JavaScript
 
 ---
 
@@ -27,20 +30,42 @@ Sistema backend desenvolvido em Python com Flask para gerenciamento de avaliaç�
 ```
 Sistema_Avaliacoes/
 ├── app/
-│   ├── __init__.py       # Inicialização do app Flask e configurações
-│   ├── models.py         # Definição das tabelas do banco de dados
-│   └── routes.py         # Rotas e lógica da aplicação
-├── migrations/           # Versionamento do banco de dados
+│   ├── __init__.py              # Inicialização do app Flask e configurações
+│   ├── models.py                # Definição das tabelas do banco de dados
+│   ├── routes.py                # Rotas e lógica da aplicação
+│   ├── templates/               # Páginas HTML (frontend)
+│   │   ├── index.html
+│   │   ├── usuarios.html
+│   │   ├── categorias.html
+│   │   ├── itens.html
+│   │   └── avaliacoes.html
+│   └── static/                  # Arquivos estáticos (CSS/JS)
+│       ├── css/
+│       └── js/
+├── migrations/                  # Versionamento do banco de dados
 ├── instance/
-│   └── avaliacoes.db     # Banco de dados SQLite (gerado automaticamente)
-├── .env                  # Variáveis de ambiente (não versionado)
-├── .gitignore            # Arquivos ignorados pelo Git
-├── requirements.txt      # Dependências do projeto
-├── run.py                # Ponto de entrada da aplicação
+│   └── avaliacoes.db            # Banco de dados SQLite (gerado automaticamente)
+├── .env                         # Variáveis de ambiente (não versionado)
+├── .gitignore                   # Arquivos ignorados pelo Git
+├── requirements.txt             # Dependências do projeto
+├── run.py                       # Ponto de entrada da aplicação
 └── README.md
 ```
 
 ---
+
+## Interface do sistema
+
+O sistema possui uma interface web acessível pelo navegador, permitindo:
+
+- Cadastro e gerenciamento de usuários
+- Cadastro de categorias
+- Cadastro de itens
+- Registro de avaliações
+- Navegação entre páginas via menu
+
+As páginas são renderizadas pelo Flask utilizando templates HTML e interagem com o backend por meio de requisições HTTP (Fetch API).
+
 
 ## Banco de dados
 
@@ -153,6 +178,24 @@ Armazena as avaliações feitas pelos usuários.
 
 ---
 
+## Acesso ao sistema
+
+Após iniciar o servidor, acesse no navegador:
+
+http://127.0.0.1:5000/
+
+Exemplos de páginas:
+
+- /page/usuarios
+- /page/categorias
+- /page/itens
+- /page/avaliacoes
+
+> Importante: não abrir os arquivos HTML diretamente, sempre acessar via servidor Flask.
+
+---
+
+
 ## Boas práticas adotadas
 
 - Uso de ambiente virtual (`venv`) para isolamento de dependências
@@ -160,3 +203,14 @@ Armazena as avaliações feitas pelos usuários.
 - Arquivo `.gitignore` configurado para não versionar `venv/` e `.env`
 - Banco de dados criado e versionado via migrations com Flask-Migrate
 - Código organizado em módulos separados por responsabilidade
+
+---
+
+
+## Screenshots
+
+### Página de usuários
+<img src="docs/usuarios.png" width="600">
+
+### Página de avaliações
+<img src="docs/avaliacoes.png" width="600">

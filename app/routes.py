@@ -1,8 +1,30 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from app import db
 from app.models import Usuario, Categoria, Item, Avaliacao
 
 bp = Blueprint('main', __name__)
+
+# ===== PÁGINAS =====
+
+@bp.route('/')
+def index():
+    return render_template('index.html')
+
+@bp.route('/page/usuarios')
+def page_usuarios():
+    return render_template('usuarios.html')
+
+@bp.route('/page/categorias')
+def page_categorias():
+    return render_template('categorias.html')
+
+@bp.route('/page/itens')
+def page_itens():
+    return render_template('itens.html')
+
+@bp.route('/page/avaliacoes')
+def page_avaliacoes():
+    return render_template('avaliacoes.html')
 
 # ===== USUÁRIOS =====
 
@@ -112,20 +134,14 @@ def listar_avaliacoes():
 @bp.route('/avaliacoes', methods=['POST'])
 def criar_avaliacao():
     dados = request.get_json()
-
-    # Valida nota entre 1 e 5
     if not 1 <= dados['nota'] <= 5:
         return jsonify({'erro': 'A nota deve ser entre 1 e 5!'}), 400
-
-    # Verifica duplicidade
     ja_existe = Avaliacao.query.filter_by(
         usuario_id=dados['usuario_id'],
         item_id=dados['item_id']
     ).first()
-
     if ja_existe:
         return jsonify({'erro': 'Usuário já avaliou esse item!'}), 409
-
     nova = Avaliacao(
         nota=dados['nota'],
         comentario=dados.get('comentario', ''),

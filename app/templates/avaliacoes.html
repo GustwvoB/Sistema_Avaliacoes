@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliações — RateIt</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-mark">R</div>
+        <span class="logo-text">RateIt</span>
+      </a>
+      <nav>
+        <a href="/">Início</a>
+        <a href="/page/usuarios">Usuários</a>
+        <a href="/page/categorias">Categorias</a>
+        <a href="/page/itens">Itens</a>
+        <a href="/page/avaliacoes" class="active">Avaliações</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h2>Avaliações</h2>
+      <p>Registre avaliações com nota de 1 a 5. Cada usuário pode avaliar cada item apenas uma vez.</p>
+    </div>
+
+    <div id="mensagem" class="mensagem hidden"></div>
+
+    <div class="form-card">
+      <h3>Nova avaliação</h3>
+      <div class="form-row">
+        <select id="aval-usuario"><option value="">Selecione o usuário</option></select>
+        <select id="aval-item"><option value="">Selecione o item</option></select>
+        <select id="aval-nota">
+          <option value="">Nota</option>
+          <option value="1">⭐ 1 — Péssimo</option>
+          <option value="2">⭐⭐ 2 — Ruim</option>
+          <option value="3">⭐⭐⭐ 3 — Regular</option>
+          <option value="4">⭐⭐⭐⭐ 4 — Bom</option>
+          <option value="5">⭐⭐⭐⭐⭐ 5 — Excelente</option>
+        </select>
+        <input type="text" id="aval-comentario" placeholder="Comentário (opcional)">
+        <button onclick="salvarAvaliacao()">Avaliar</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuário</th>
+            <th>Item</th>
+            <th>Nota</th>
+            <th>Comentário</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="lista-avaliacoes"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    let usuarios = [], itens = [];
+
+    Promise.all([
+      fetch('/usuarios').then(r => r.json()),
+      fetch('/itens').then(r => r.json())
+    ]).then(([u, i]) => {
+      usuarios = u; itens = i;
+      const selU = document.getElementById('aval-usuario');
+      const selI = document.getElementById('aval-item');
+      u.forEach(x => { selU.innerHTML += `<option value="${x.id}">${x.nome}</option>`; });
+      i.forEach(x => { selI.innerHTML += `<option value="${x.id}">${x.nome}</option>`; });
+      carregarAvaliacoes();
+    });
+
+    function carregarAvaliacoes() {
+      fetch('/avaliacoes').then(r => r.json()).then(data => {
+        const tbody = document.getElementById('lista-avaliacoes');
+        tbody.innerHTML = '';
+        if (!data.length) {
+          tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Nenhuma avaliação registrada.</td></tr>';
+          return;
+        }
+        data.forEach(a => {
+          const u = usuarios.find(x => x.id === a.usuario_id);
+          const i = itens.find(x => x.id === a.item_id);
+          const estrelas = '<span class="stars">' + '★'.repeat(a.nota) + '<span style="opacity:0.2">' + '★'.repeat(5 - a.nota) + '</span></span>';
+          tbody.innerHTML += `
+            <tr>
+              <td><span class="id-badge">#${a.id}</span></td>
+              <td>${u ? u.nome : '—'}</td>
+              <td>${i ? i.nome : '—'}</td>
+              <td>${estrelas}</td>
+              <td>${a.comentario || '<span style="color:var(--text-muted)">—</span>'}</td>
+              <td class="acoes">
+                <button class="btn-deletar" onclick="deletarAvaliacao(${a.id})">Deletar</button>
+              </td>
+            </tr>`;
+        });
+      });
+    }
+
+    function salvarAvaliacao() {
+      const usuario_id = parseInt(document.getElementById('aval-usuario').value);
+      const item_id = parseInt(document.getElementById('aval-item').value);
+      const nota = parseInt(document.getElementById('aval-nota').value);
+      const comentario = document.getElementById('aval-comentario').value.trim();
+      if (!usuario_id || !item_id || !nota) { mostrarMensagem('Preencha todos os campos obrigatórios!', 'erro'); return; }
+      fetch('/avaliacoes', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({usuario_id, item_id, nota, comentario})
+      })
+      .then(r => r.json().then(data => ({status: r.status, data})))
+      .then(({status, data}) => {
+        if (status === 409) { mostrarMensagem('Este usuário já avaliou esse item!', 'erro'); return; }
+        if (data.erro) { mostrarMensagem(data.erro, 'erro'); return; }
+        mostrarMensagem('Avaliação registrada!', 'sucesso');
+        document.getElementById('aval-usuario').value = '';
+        document.getElementById('aval-item').value = '';
+        document.getElementById('aval-nota').value = '';
+        document.getElementById('aval-comentario').value = '';
+        carregarAvaliacoes();
+      });
+    }
+
+    function deletarAvaliacao(id) {
+      if (!confirm('Deseja deletar esta avaliação?')) return;
+      fetch(`/avaliacoes/${id}`, {method:'DELETE'}).then(r => r.json()).then(() => {
+        mostrarMensagem('Avaliação deletada!', 'sucesso'); carregarAvaliacoes();
+      });
+    }
+  </script>
+</body>
+</html>

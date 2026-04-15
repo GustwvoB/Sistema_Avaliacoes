@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Itens — RateIt</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="logo">
+        <div class="logo-mark">R</div>
+        <span class="logo-text">RateIt</span>
+      </a>
+      <nav>
+        <a href="/">Início</a>
+        <a href="/page/usuarios">Usuários</a>
+        <a href="/page/categorias">Categorias</a>
+        <a href="/page/itens" class="active">Itens</a>
+        <a href="/page/avaliacoes">Avaliações</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h2>Itens</h2>
+      <p>Cadastre filmes, produtos, locais ou qualquer item para avaliação.</p>
+    </div>
+
+    <div id="mensagem" class="mensagem hidden"></div>
+
+    <div class="form-card">
+      <h3 id="form-titulo">Novo item</h3>
+      <div class="form-row">
+        <input type="hidden" id="item-id">
+        <input type="text" id="item-nome" placeholder="Nome do item">
+        <select id="item-categoria">
+          <option value="">Selecione a categoria</option>
+        </select>
+        <button onclick="salvarItem()">Salvar</button>
+        <button class="btn-secondary" onclick="cancelarEdicao()" id="btn-cancelar" style="display:none">Cancelar</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="lista-itens"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    let categorias = [];
+
+    fetch('/categorias').then(r => r.json()).then(data => {
+      categorias = data;
+      const sel = document.getElementById('item-categoria');
+      data.forEach(c => { sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`; });
+      carregarItens();
+    });
+
+    function carregarItens() {
+      fetch('/itens').then(r => r.json()).then(data => {
+        const tbody = document.getElementById('lista-itens');
+        tbody.innerHTML = '';
+        if (!data.length) {
+          tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Nenhum item cadastrado.</td></tr>';
+          return;
+        }
+        data.forEach(i => {
+          const cat = categorias.find(c => c.id === i.categoria_id);
+          tbody.innerHTML += `
+            <tr>
+              <td><span class="id-badge">#${i.id}</span></td>
+              <td>${i.nome}</td>
+              <td>${cat ? cat.nome : '—'}</td>
+              <td class="acoes">
+                <button class="btn-editar" onclick="editarItem(${i.id},'${i.nome}',${i.categoria_id})">Editar</button>
+                <button class="btn-deletar" onclick="deletarItem(${i.id})">Deletar</button>
+              </td>
+            </tr>`;
+        });
+      });
+    }
+
+    function salvarItem() {
+      const id = document.getElementById('item-id').value;
+      const nome = document.getElementById('item-nome').value.trim();
+      const categoria_id = parseInt(document.getElementById('item-categoria').value);
+      if (!nome || !categoria_id) { mostrarMensagem('Preencha todos os campos!', 'erro'); return; }
+      const url = id ? `/itens/${id}` : '/itens';
+      const method = id ? 'PUT' : 'POST';
+      fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify({nome, categoria_id}) })
+        .then(r => r.json()).then(data => {
+          if (data.erro) { mostrarMensagem(data.erro, 'erro'); return; }
+          mostrarMensagem(id ? 'Item atualizado!' : 'Item criado!', 'sucesso');
+          cancelarEdicao(); carregarItens();
+        });
+    }
+
+    function editarItem(id, nome, categoria_id) {
+      document.getElementById('item-id').value = id;
+      document.getElementById('item-nome').value = nome;
+      document.getElementById('item-categoria').value = categoria_id;
+      document.getElementById('form-titulo').textContent = 'Editar item';
+      document.getElementById('btn-cancelar').style.display = 'inline-block';
+    }
+
+    function deletarItem(id) {
+      if (!confirm('Deseja deletar este item?')) return;
+      fetch(`/itens/${id}`, {method:'DELETE'}).then(r => r.json()).then(() => {
+        mostrarMensagem('Item deletado!', 'sucesso'); carregarItens();
+      });
+    }
+
+    function cancelarEdicao() {
+      document.getElementById('item-id').value = '';
+      document.getElementById('item-nome').value = '';
+      document.getElementById('item-categoria').value = '';
+      document.getElementById('form-titulo').textContent = 'Novo item';
+      document.getElementById('btn-cancelar').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
