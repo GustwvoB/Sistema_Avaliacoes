@@ -209,8 +209,27 @@ Exemplos de páginas:
 
 ## Screenshots
 
-### Página de usuários
-<img src="docs/usuarios.png" width="600">
+### Página de Início
+<p align="center">
+  <img src="https://i.pinimg.com/736x/1a/93/eb/1a93eb1ed50e422b0a929039f0dcdc4b.jpg" width="600"/>
+</p>
 
-### Página de avaliações
-<img src="docs/avaliacoes.png" width="600">
+### Página de Usuários
+<p align="center">
+  <img src="https://i.pinimg.com/736x/73/13/6e/73136ebd71cb1a10208aba8a00e2d87f.jpg" width="600"/>
+</p>
+
+### Página de Categorias
+<p align="center">
+  <img src="https://i.pinimg.com/736x/27/fd/3e/27fd3e1fd62f8e716d07ff4e14ae1448.jpg" width="600"/>
+</p>
+
+### Página de Itens
+<p align="center">
+  <img src="https://i.pinimg.com/736x/81/13/62/811362d143c3cab92a34a4912b4ff0e6.jpg" width="600"/>
+</p>
+
+### Página de Avaliações
+<p align="center">
+  <img src="https://i.pinimg.com/736x/73/cd/bd/73cdbd700073d75b2e5db8445fdf98a5.jpg" width="600"/>
+</p>
